@@ -1,0 +1,2 @@
+class StegoAlgorithm(object):
+    pass
