@@ -1,5 +1,5 @@
 from tkinter import *
-import gui
+import gui.initial
 
 root = Tk()
-gui.main(root)
+gui.initial.main(root)
