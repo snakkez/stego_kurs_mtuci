@@ -1,3 +1,7 @@
+import tkinter
+from tkinter import *
+from tkinter.ttk import *
+from PIL import Image, ImageTk
 class Find:
     def __init__(self, master):
         self.des_key = ''
