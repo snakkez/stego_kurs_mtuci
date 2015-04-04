@@ -42,7 +42,7 @@ class BMPLSB(StegoAlgorithm):
     @staticmethod
     def write_to_pixels(img, pixel_list, sliced_stego_data):
         sliced_stego_data = sliced_stego_data[::-1]
-        channels = img.decompose_to_channels()
+        channels = img.decompose_to_binary_channels()
         for channel in channels:
             for x, y in pixel_list:
                 try:
@@ -51,14 +51,14 @@ class BMPLSB(StegoAlgorithm):
                     data_byte = channel[y][x][:8-stego_len]+stego_slice
                     channel[y][x] = data_byte
                 except IndexError:
-                    img.compose_from_channels(channels)
+                    img.compose_from_binary_channels(channels)
                     return True
 
     @staticmethod
     def get_from_pixels(img, pixel_list, bytes_n, depth):
         bytes = []
         buffer = ''
-        channels = img.decompose_to_channels()
+        channels = img.decompose_to_binary_channels()
         for channel in channels:
             if len(bytes) == bytes_n:
                     return bytearray([int(byte, 2) for byte in bytes])

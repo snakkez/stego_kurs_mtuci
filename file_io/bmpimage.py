@@ -35,12 +35,24 @@ class BMPImage(Image):
         self.data[start:end] = pixel
 
     def decompose_to_channels(self):
+        r_channel = [[self.get_pixel((x, y))[2] for x in range(0, self.height)] for y in range(0, self.width)]
+        g_channel = [[self.get_pixel((x, y))[1] for x in range(0, self.height)] for y in range(0, self.width)]
+        b_channel = [[self.get_pixel((x, y))[0] for x in range(0, self.height)] for y in range(0, self.width)]
+        return b_channel, g_channel, r_channel
+
+    def compose_from_channels(self, channels):
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                self.set_pixel((x,y), bytearray((channels[2][y][x], channels[1][y][x], channels[0][y][x])))
+        return 0
+
+    def decompose_to_binary_channels(self):
         r_channel = [[format(self.get_pixel((x, y))[2], '08b') for x in range(0, self.height)] for y in range(0, self.width)]
         g_channel = [[format(self.get_pixel((x, y))[1], '08b') for x in range(0, self.height)] for y in range(0, self.width)]
         b_channel = [[format(self.get_pixel((x, y))[0], '08b') for x in range(0, self.height)] for y in range(0, self.width)]
         return b_channel, g_channel, r_channel
 
-    def compose_from_channels(self, channels):
+    def compose_from_binary_channels(self, channels):
         for y in range(0, self.height):
             for x in range(0, self.width):
                 b = int(channels[0][y][x], 2)
