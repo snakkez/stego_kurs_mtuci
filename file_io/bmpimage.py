@@ -12,6 +12,14 @@ class BMPImage(Image):
         padding = (4 - (row_byte_len % 4)) % 4
         self.row_offset = row_byte_len + padding
 
+
+    def return_dummy(self):
+        dummy = BMPImage(self.export())
+        for y in range(dummy.height):
+            for x in range(dummy.width):
+                dummy.set_pixel((x, y), bytearray([0, 0, 0]))
+        return dummy
+
     def get_pixel_offset(self, pos, raw=False):
         x, y = pos
         if not raw:

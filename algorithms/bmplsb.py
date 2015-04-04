@@ -1,5 +1,6 @@
 from .stegoalogrithm import StegoAlgorithm
 from helpers.exceptions import *
+from file_io.bmpimage import BMPImage
 
 class BMPLSB(StegoAlgorithm):
     @staticmethod
@@ -89,20 +90,21 @@ class BMPLSB(StegoAlgorithm):
         BMPLSB.write_to_pixels(img, stego_pixels, sliced_stego_data)
 
     @staticmethod
-    def put_stego(img, stego_data, depth=1, density=None):
+    def put_stego(original_img, stego_data, depth=1, density=None):
         stego_data_len = len(stego_data)
+        stego_img = BMPImage(original_img.export())
 
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
             raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
 
-        if (img.height * img.width) < 24:
+        if (stego_img.height * stego_img.width) < 24:
             raise ImageTooSmallException('Image is too small to contain header.')
 
-        max_stego_size = BMPLSB.calc_max_stego_data_size(img, depth)
+        max_stego_size = BMPLSB.calc_max_stego_data_size(stego_img, depth)
         if stego_data_len > max_stego_size:
             raise StegomessageSizeException('Stegomessage is too long.')
 
-        max_stego_density = BMPLSB.calc_max_stego_density(img, stego_data_len, depth)
+        max_stego_density = BMPLSB.calc_max_stego_density(stego_img, stego_data_len, depth)
 
         if density == None:
             density = max_stego_density
@@ -110,13 +112,11 @@ class BMPLSB(StegoAlgorithm):
             raise DensityException("Density is too big. Maximum density is " + str(max_stego_density))
         elif density <= 0:
             raise DensityException("Density cannot be smaller than 0.")
-        BMPLSB.put_header(img, stego_data)
+        BMPLSB.put_header(stego_img, stego_data)
 
-        BMPLSB.put_stego_data(density, depth, img, stego_data)
+        BMPLSB.put_stego_data(density, depth, stego_img, stego_data)
 
-        stego_params = {'stego_data_length': stego_data_len, 'depth': depth, 'density': density}
-
-        return img, stego_params
+        return stego_img
 
     @staticmethod
     def get_header(img):
