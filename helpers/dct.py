@@ -13,14 +13,13 @@ coeff_array = [[1.0, 0.980785, 0.92388, 0.83147, 0.707107, 0.55557, 0.382683, 0.
                    [1.0, -0.83147, 0.382683, 0.19509, -0.707107, 0.980785, -0.92388, 0.55557],
                    [1.0, -0.980785, 0.92388, -0.83147, 0.707107, -0.55557, 0.382683, -0.19509]]
 
+
 def DCT(img):
     if (img.width % 8 != 0) | (img.height % 8 != 0):
         raise DCTDimensionException
         return 0
 
-
     channels = [slice_into_subarrays(channel) for channel in img.decompose_to_channels()]
-
 
     for channel in channels:
         for y_arr in range(len(channel)):
@@ -29,14 +28,11 @@ def DCT(img):
                 subarray_dct = forward_transform_block(subarray)
                 channel[y_arr][x_arr] = subarray_dct
 
-    merged_channels = [merge_from_subarrays(channel) for channel in channels]
+    return channels
 
-
-    return merged_channels
 
 def IDCT(channels, img):
     restored_img = BMPImage(img.export())
-    channels = [slice_into_subarrays(channel) for channel in channels]
     for channel in channels:
         for y_arr in range(len(channel)):
             for x_arr in range(len(channel[0])):
@@ -48,7 +44,8 @@ def IDCT(channels, img):
 
     return restored_img
 
-def VisualDCT(channels, img):
+
+def visualDCT(channels, img):
     vis_img = BMPImage(img.export())
     for channel in channels:
         maxv = float('-inf')
@@ -71,11 +68,13 @@ def VisualDCT(channels, img):
     vis_img.compose_from_channels(channels)
     return vis_img
 
+
 def A(k):
     if k == 0:
         return math.sqrt(0.5)
     else:
         return 1
+
 
 def forward_transform_block(block):
     dct_block = [[0 for x in range(8)] for y in range(8)]

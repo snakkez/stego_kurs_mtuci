@@ -1,6 +1,6 @@
 from algorithms.bmplsb import BMPLSB
 from file_io.bmpimage import BMPImage
-from helpers.dct import DCT, IDCT, VisualDCT
+from helpers.dct import DCT, IDCT, visualDCT
 
 
 file = open('ts1.bmp', 'rb')
