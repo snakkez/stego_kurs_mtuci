@@ -1,6 +1,8 @@
 from .bmplsb import BMPLSB
 from helpers.exceptions import *
+from file_io.bmpimage import BMPImage
 import random
+
 
 class DistributionCeilException(Exception):
     def __init__(self, value):
@@ -9,13 +11,15 @@ class DistributionCeilException(Exception):
     def __str__(self):
         return repr(self.parameter)
 
+
 class BMPLSBInterval(BMPLSB):
     @staticmethod
     def gamma_list(seed, max_density, distribution_ceil, size):
         if distribution_ceil > max_density:
-            raise DistributionCeilException('Distribution cell can not be higher than maximum density.')
+            raise DistributionCeilException('Distribution cell can not be higher than maximum density.' +
+                                            ' Maximum density: ' + str(max_density))
         random.seed(seed)
-        return [random.randint(1,distribution_ceil) for i in range(0, size)]
+        return [random.randint(1, distribution_ceil) for i in range(0, size)]
 
     @staticmethod
     def get_pixel_list_for_stego_data(img, max_density, distribution_ceil, seed):
@@ -35,23 +39,23 @@ class BMPLSBInterval(BMPLSB):
         return stego_pixels_cut
 
     @staticmethod
-    def put_stego(img, stego_data, seed, ceil, depth=1) :
+    def put_stego(original_img, stego_data, seed, ceil, depth=1):
         stego_data_len = len(stego_data)
-
+        stego_img = BMPImage(original_img.export())
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
             raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
 
-        if (img.height * img.width) < 24:
+        if (stego_img.height * stego_img.width) < 24:
             raise ImageTooSmallException('Image is too small to contain header.')
 
-        max_stego_size = BMPLSBInterval.calc_max_stego_data_size(img, depth)
+        max_stego_size = BMPLSBInterval.calc_max_stego_data_size(stego_img, depth)
         if stego_data_len > max_stego_size:
             raise StegomessageSizeException('Stegomessage is too long.')
 
-        max_stego_density = BMPLSBInterval.calc_max_stego_density(img, stego_data_len, depth)
-        BMPLSBInterval.put_header(img, stego_data)
-        BMPLSBInterval.put_stego_data(max_stego_density, depth, img, stego_data, ceil, seed)
-        return img
+        max_stego_density = BMPLSBInterval.calc_max_stego_density(stego_img, stego_data_len, depth)
+        BMPLSBInterval.put_header(stego_img, stego_data)
+        BMPLSBInterval.put_stego_data(max_stego_density, depth, stego_img, stego_data, ceil, seed)
+        return stego_img
 
     @staticmethod
     def get_stego(img, seed, ceil, depth=1):
