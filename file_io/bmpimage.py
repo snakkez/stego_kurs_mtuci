@@ -43,7 +43,7 @@ class BMPImage(Image):
     def compose_from_channels(self, channels):
         for y in range(0, self.height):
             for x in range(0, self.width):
-                self.set_pixel((x,y), bytearray((channels[2][y][x], channels[1][y][x], channels[0][y][x])))
+                self.set_pixel((x,y), bytearray((channels[0][y][x], channels[1][y][x], channels[2][y][x])))
         return 0
 
     def decompose_to_binary_channels(self):
