@@ -95,23 +95,24 @@ class BMPLSB(StegoAlgorithm):
         stego_img = BMPImage(original_img.export())
 
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
-            raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
+            raise DepthException('Глубина скрытия не равна 1, 2 или 4 бит.')
 
         if (stego_img.height * stego_img.width) < 24:
-            raise ImageTooSmallException('Image is too small to contain header.')
+            raise ImageTooSmallException('Картинка слишком мала для заголовка.')
 
         max_stego_size = BMPLSB.calc_max_stego_data_size(stego_img, depth)
         if stego_data_len > max_stego_size:
-            raise StegomessageSizeException('Stegomessage is too long.')
+            raise StegomessageSizeException('Стегосообщение слишком большое.')
 
         max_stego_density = BMPLSB.calc_max_stego_density(stego_img, stego_data_len, depth)
 
         if density == None:
             density = max_stego_density
         elif density > max_stego_density:
-            raise DensityException("Density is too big. Maximum density is " + str(max_stego_density))
+            raise DensityException("Плотность скрытия слишком велика. Максимальная плотность скрытия равна "
+                                   + str(max_stego_density))
         elif density <= 0:
-            raise DensityException("Density cannot be smaller than 0.")
+            raise DensityException("Плотность скрытия не может быть меньше 1.")
         BMPLSB.put_header(stego_img, stego_data)
 
         BMPLSB.put_stego_data(density, depth, stego_img, stego_data)
@@ -124,7 +125,7 @@ class BMPLSB(StegoAlgorithm):
         pixels_for_header = BMPLSB.get_first_n_pixels_list(img, 12)
         header_bytes = BMPLSB.get_from_pixels(img, pixels_for_header, 6, 4)
         if header_bytes[:3] != correct_header_flag:
-            raise NoHeaderFoundException('No header found!')
+            raise NoHeaderFoundException('Не найден заголовок!')
         stego_bytes_size = int.from_bytes(header_bytes[3:], 'little')
         return stego_bytes_size
 
@@ -138,23 +139,24 @@ class BMPLSB(StegoAlgorithm):
     @staticmethod
     def get_stego(img, depth=1, density=1):
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
-            raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
+            raise DepthException('Глубина скрытия не равна 1, 2 или 4 бит.')
 
         if (img.height * img.width) < 24:
-            raise ImageTooSmallException('Image is too small to contain header.')
+            raise ImageTooSmallException('Картинка слишком мала, чтобы содержать заголовок.')
 
         stego_bytes_size = BMPLSB.get_header(img)
 
         max_stego_size = BMPLSB.calc_max_stego_data_size(img, depth)
         if stego_bytes_size > max_stego_size:
-            raise StegomessageSizeException('Depth is too small to extract stegomessage of this size from image.')
+            raise StegomessageSizeException('Глубина скрытия слишком мала, чтобы извлечь сообщение такого размера.')
 
         max_stego_density = BMPLSB.calc_max_stego_density(img, stego_bytes_size, depth)
 
         if density > max_stego_density:
-            raise DensityException("Density is too big. Maximum density is " + str(max_stego_density))
+            raise DensityException("Плотность скрытия слишком велика. Максимальная плотность скрытия равна %s."
+                                   % str(max_stego_density))
         elif density <= 0:
-            raise DensityException("Density cannot be smaller than 0.")
+            raise DensityException("Плотность скрытия не может быть меньше 1.")
 
         stego_data = BMPLSB.get_stego_data(density, depth, img, stego_bytes_size)
 

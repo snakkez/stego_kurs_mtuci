@@ -16,8 +16,10 @@ class BMPLSBInterval(BMPLSB):
     @staticmethod
     def gamma_list(seed, max_density, distribution_ceil, size):
         if distribution_ceil > max_density:
-            raise DistributionCeilException('Distribution cell can not be higher than maximum density.' +
-                                            ' Maximum density: ' + str(max_density))
+            raise DistributionCeilException('Максимальный интервал не может быть больше максимальной плотности. '
+                                            'Максимальная плотность: %s.'
+                                            'Distribution cell can not be higher than maximum density.' +
+                                            ' Maximum density: ' % str(max_density))
         random.seed(seed)
         return [random.randint(1, distribution_ceil) for i in range(0, size)]
 
@@ -43,14 +45,14 @@ class BMPLSBInterval(BMPLSB):
         stego_data_len = len(stego_data)
         stego_img = BMPImage(original_img.export())
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
-            raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
+            raise DepthException('Глубина скрытия не равна 1, 2 или 4 бит.')
 
         if (stego_img.height * stego_img.width) < 24:
-            raise ImageTooSmallException('Image is too small to contain header.')
+            raise ImageTooSmallException('Картинка слишком мал для заголовка.')
 
         max_stego_size = BMPLSBInterval.calc_max_stego_data_size(stego_img, depth)
         if stego_data_len > max_stego_size:
-            raise StegomessageSizeException('Stegomessage is too long.')
+            raise StegomessageSizeException('Стегосообщение слишком большое.')
 
         max_stego_density = BMPLSBInterval.calc_max_stego_density(stego_img, stego_data_len, depth)
         BMPLSBInterval.put_header(stego_img, stego_data)
@@ -60,16 +62,16 @@ class BMPLSBInterval(BMPLSB):
     @staticmethod
     def get_stego(img, seed, ceil, depth=1):
         if (depth != 1) ^ (depth != 2) ^ (depth != 4):
-            raise DepthException('Depth is not equal to 1, 2 or 4 bits.')
+            raise DepthException('Глубина скрытия не равна 1, 2 или 4 бит.')
 
         if (img.height * img.width) < 24:
-            raise ImageTooSmallException('Image is too small to contain header.')
+            raise ImageTooSmallException('Картинка слишком мал для заголовка.')
 
         stego_bytes_size = BMPLSBInterval.get_header(img)
 
         max_stego_size = BMPLSBInterval.calc_max_stego_data_size(img, depth)
         if stego_bytes_size > max_stego_size:
-            raise StegomessageSizeException('Depth is too small to extract stegomessage of this size from image.')
+            raise StegomessageSizeException('Глубина скрытия слишком мала, чтобы извлечь сообщение такого размера.')
 
         max_stego_density = BMPLSBInterval.calc_max_stego_density(img, stego_bytes_size, depth)
 

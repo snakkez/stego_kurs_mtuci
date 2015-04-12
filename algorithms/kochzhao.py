@@ -23,11 +23,11 @@ class KochZhao(StegoAlgorithm):
         stego_img = BMPImage(img.export())
 
         if (stego_img.width*stego_img.height) < 704:
-            raise ImageTooSmallException("Image is too small to contain header.")
+            raise ImageTooSmallException("Картинка слишком мал для заголовка.")
 
         max_stego_size = KochZhao.calc_max_stego_data_size(stego_img)
         if stego_data_len > max_stego_size:
-            raise StegomessageSizeException('Stegomessage is too long.')
+            raise StegomessageSizeException('Стегосообщение слишком большое.')
 
         stego_img = KochZhao.put_stego_data(stego_img, stego_message)
 
@@ -38,13 +38,13 @@ class KochZhao(StegoAlgorithm):
         stego_data_conv = []
         for byte in stego_data:
             bin_byte = format(byte, '08b')
-            stego_data_conv += [bin_byte[i:i+1] for i in range(0,8)]
+            stego_data_conv += [bin_byte[i:i+1] for i in range(0, 8)]
 
         return stego_data_conv[::-1]
 
     @staticmethod
     def merge_bits(bits):
-        bytes = [''.join(bits[i:i+8]) for i in range(0, len(bits),8)]
+        bytes = [''.join(bits[i:i+8]) for i in range(0, len(bits), 8)]
         if len(bytes[-1]) != 8:
             bytes.pop()
 
@@ -84,7 +84,7 @@ class KochZhao(StegoAlgorithm):
     @staticmethod
     def get_stego(stego_img):
         if (stego_img.width*stego_img.height) < 704:
-            raise ImageTooSmallException("Image is too small to contain header.")
+            raise ImageTooSmallException("Картинка слишком мала, чтобы содержать заголовок.")
 
         stego_data_bits = KochZhao.get_stego_data(stego_img)
 
@@ -93,7 +93,7 @@ class KochZhao(StegoAlgorithm):
         stego_header = stego_data_all[:4]
 
         if stego_header[:2] != bytearray('KZ', 'ascii'):
-            raise NoHeaderFoundException('No header was found, aborting.')
+            raise NoHeaderFoundException('Не найден заголовок!')
 
         bytenum = int.from_bytes(stego_header[2:4], 'little')
 
@@ -142,4 +142,3 @@ class KochZhao(StegoAlgorithm):
             k2a = 0
 
         return k1a, k2a
-
